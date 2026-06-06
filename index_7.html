@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAT Intelligence Hub — กองแผนงานและยุทธศาสตร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root {
+  --ink:         #111111;
+  --ink-2:       #444444;
+  --ink-3:       #888888;
+  --ink-4:       #BBBBBB;
+  --rule:        #E0E0E0;
+  --surface:     #F7F7F7;
+  --white:       #FFFFFF;
+  --blue:        #1565C0;
+  --blue-faint:  #E3F0FB;
+  --green:       #1B5E20;
+  --green-faint: #E8F5E9;
+  --amber:       #E65100;
+  --amber-faint: #FFF3E0;
+  --red:         #B71C1C;
+  --red-faint:   #FFEBEE;
+  --max-w: 1120px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LOGIN OVERLAY ─────────────────────────────────────── */
+#login-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #0d1b2a;
+  display: flex; align-items: center; justify-content: center;
+}
+.login-box {
+  background: #fff;
+  width: 380px;
+  padding: 40px 36px 36px;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.login-mark {
+  width: 48px; height: 48px;
+  background: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.login-mark span {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px; font-weight: 800; color: #fff; letter-spacing: 0.02em;
+}
+.login-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px; font-weight: 800; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ink);
+  margin-bottom: 4px; text-align: center;
+}
+.login-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3); margin-bottom: 28px; text-align: center;
+}
+.login-rule { width: 100%; border: none; border-top: 1px solid var(--rule); margin-bottom: 24px; }
+.login-note {
+  font-size: 11px; color: var(--ink-3); text-align: center;
+  margin-bottom: 20px; line-height: 1.6;
+}
+.login-note strong { color: var(--ink-2); }
+#g-btn-wrap { display: flex; justify-content: center; width: 100%; }
+.login-error {
+  margin-top: 16px;
+  background: var(--red-faint);
+  border: 1px solid #f5c6cb;
+  padding: 10px 14px;
+  font-size: 11.5px; color: var(--red);
+  line-height: 1.6; text-align: center;
+  display: none; width: 100%;
+}
+.login-footer {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--ink-4); margin-top: 24px; text-align: center;
+}
+
+/* ── MAIN CONTENT (hidden until auth) ─────────────────── */
+#main-content { display: none; }
+
+/* HEADER */
+header { border-bottom: 3px solid var(--ink); background: var(--white); position: sticky; top: 0; z-index: 100; }
+.header-inner { max-width: var(--max-w); margin: 0 auto; padding: 0 40px; display: flex; align-items: stretch; }
+.header-mark { display: flex; align-items: center; padding: 18px 32px 18px 0; border-right: 1px solid var(--rule); gap: 12px; text-decoration: none; }
+.header-mark-box { width: 36px; height: 36px; background: var(--ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.header-mark-box span { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; color: var(--white); letter-spacing: 0.02em; }
+.header-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: 0.03em; text-transform: uppercase; line-height: 1.1; }
+.header-sub   { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--ink-3); letter-spacing: 0.12em; text-transform: uppercase; }
+.header-meta  { margin-left: auto; display: flex; align-items: center; gap: 28px; }
+.meta-label   { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--ink-4); letter-spacing: 0.14em; text-transform: uppercase; display: block; }
+.meta-value   { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.header-user  { display: flex; align-items: center; gap: 8px; padding-left: 20px; border-left: 1px solid var(--rule); }
+.header-user-name { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-2); }
+.header-signout { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink-4); background: none; border: 1px solid var(--rule); padding: 4px 8px; cursor: pointer; }
+.header-signout:hover { border-color: var(--ink-3); color: var(--ink-2); }
+
+/* HERO */
+.hero { border-bottom: 1px solid var(--rule); background: var(--surface); }
+.hero-inner { max-width: var(--max-w); margin: 0 auto; padding: 52px 40px 44px; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 40px; }
+.hero-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
+.hero-headline { font-family: 'Barlow Condensed', sans-serif; font-size: 56px; font-weight: 800; line-height: 1.0; letter-spacing: -0.01em; color: var(--ink); text-transform: uppercase; margin-bottom: 18px; }
+.hero-headline em { font-style: normal; color: var(--blue); }
+.hero-desc { font-size: 13.5px; line-height: 1.75; color: var(--ink-2); max-width: 520px; }
+.hero-stats { display: flex; flex-direction: column; gap: 2px; min-width: 180px; }
+.stat-row { background: var(--white); border: 1px solid var(--rule); padding: 12px 18px; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.stat-num  { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; color: var(--ink); line-height: 1; }
+.stat-unit { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+
+/* SECTION */
+.section { max-width: var(--max-w); margin: 0 auto; padding: 48px 40px; }
+.section-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.section-num   { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--ink-4); text-transform: uppercase; flex-shrink: 0; }
+.section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); }
+
+/* CARD GRID */
+.card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; background: var(--ink); }
+
+/* DASHBOARD CARD */
+.dash-card { background: var(--white); padding: 28px 28px 24px; display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: background 0.15s; }
+.dash-card:hover { background: var(--surface); }
+.dash-card.pending { opacity: 0.5; cursor: default; pointer-events: none; }
+.card-accent { width: 24px; height: 3px; margin-bottom: 20px; }
+.card-accent.blue  { background: var(--blue); }
+.card-accent.green { background: var(--green); }
+.card-accent.amber { background: var(--amber); }
+.card-index { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 8px; }
+.card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink); line-height: 1.15; margin-bottom: 12px; }
+.card-desc  { font-size: 12.5px; line-height: 1.65; color: var(--ink-2); flex-grow: 1; margin-bottom: 20px; }
+.card-meta-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--rule); padding-top: 14px; margin-top: auto; }
+.card-tag { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 7px; border: 1px solid currentColor; }
+.card-tag.blue  { color: var(--blue); }
+.card-tag.green { color: var(--green); }
+.card-tag.amber { color: var(--amber); }
+.card-status { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink-4); display: flex; align-items: center; gap: 5px; }
+.card-status::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-4); }
+.card-status.live { color: var(--green); }
+.card-status.live::before { background: var(--green); }
+.card-status.pending-dot { color: var(--amber); }
+.card-status.pending-dot::before { background: var(--amber); }
+.card-arrow { font-size: 16px; color: var(--ink-3); transition: transform 0.15s; }
+.dash-card:hover .card-arrow { transform: translateX(4px); }
+
+/* COLOR LEGEND */
+.legend-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--ink); }
+.legend-cell { padding: 16px 20px; display: flex; align-items: flex-start; gap: 12px; }
+.legend-cell.blue  { background: var(--blue-faint); }
+.legend-cell.green { background: var(--green-faint); }
+.legend-cell.amber { background: var(--amber-faint); }
+.legend-cell.red   { background: var(--red-faint); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
+.blue  .legend-dot { background: var(--blue); }
+.green .legend-dot { background: var(--green); }
+.amber .legend-dot { background: var(--amber); }
+.red   .legend-dot { background: var(--red); }
+.legend-cat    { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 3px; }
+.blue  .legend-cat { color: var(--blue); }
+.green .legend-cat { color: var(--green); }
+.amber .legend-cat { color: var(--amber); }
+.red   .legend-dot + div .legend-cat { color: var(--red); }
+.legend-detail { font-size: 11px; line-height: 1.5; color: var(--ink-2); }
+
+hr.section-divider { border: none; border-top: 1px solid var(--rule); margin: 0 40px; }
+
+footer { border-top: 3px solid var(--ink); margin-top: 60px; background: var(--surface); }
+.footer-inner { max-width: var(--max-w); margin: 0 auto; padding: 28px 40px; display: flex; align-items: center; justify-content: space-between; }
+.footer-org  { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.footer-note { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); }
+
+@media (max-width: 768px) {
+  .header-inner { padding: 0 20px; }
+  .hero-inner   { padding: 32px 20px 28px; grid-template-columns: 1fr; }
+  .hero-headline { font-size: 38px; }
+  .section      { padding: 36px 20px; }
+  hr.section-divider { margin: 0 20px; }
+  .card-grid    { grid-template-columns: 1fr; }
+  .legend-grid  { grid-template-columns: 1fr 1fr; }
+  .footer-inner { flex-direction: column; gap: 8px; align-items: flex-start; padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN OVERLAY ──────────────────────────────────────── -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-mark"><span>PAT</span></div>
+    <div class="login-title">Intelligence Hub</div>
+    <div class="login-sub">กองประเมินผลองค์กร · การท่าเรือแห่งประเทศไทย · FY2569</div>
+    <hr class="login-rule">
+    <div class="login-note">
+      เข้าใช้งานด้วย Google Account<br>
+      <strong>เฉพาะอีเมล์ @port.co.th เท่านั้น</strong>
+    </div>
+    <div id="g-btn-wrap">
+      <div id="g_id_onload"
+        data-client_id="850818349851-ukh2ldprhknc44e2c5sij0fbnjr2c6fd.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-theme="outline"
+        data-text="sign_in_with"
+        data-shape="rectangular"
+        data-logo_alignment="left">
+      </div>
+    </div>
+    <div class="login-error" id="login-error">
+      ⛔ อีเมล์นี้ไม่ได้รับอนุญาต<br>
+      กรุณาใช้อีเมล์ <strong>@port.co.th</strong> เท่านั้น
+    </div>
+    <div class="login-footer">Internal Use Only · pdee-hub.github.io</div>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ───────────────────────────────────────── -->
+<div id="main-content">
+
+<header>
+  <div class="header-inner">
+    <a class="header-mark" href="#">
+      <div class="header-mark-box"><span>PAT</span></div>
+      <div>
+        <div class="header-title">Intelligence Hub</div>
+        <div class="header-sub">กองประเมินผลองค์กร · การท่าเรือแห่งประเทศไทย</div>
+      </div>
+    </a>
+    <div class="header-meta">
+      <div>
+        <span class="meta-label">ปีงบประมาณ</span>
+        <span class="meta-value">2569</span>
+      </div>
+      <div>
+        <span class="meta-label">Dashboards</span>
+        <span class="meta-value">4 ระบบ</span>
+      </div>
+      <div class="header-user">
+        <span class="header-user-name" id="user-email">—</span>
+        <button class="header-signout" onclick="signOut()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="hero-eyebrow">Performance Intelligence Platform · FY2569</p>
+      <h1 class="hero-headline">PAT<br><em>Analytics</em><br>Hub</h1>
+      <p class="hero-desc">ศูนย์รวม Dashboard การวิเคราะห์ประสิทธิภาพองค์กร ครอบคลุมการเงิน, ตัวชี้วัด MOU, และการประเมิน SE-AM Core Business Enablers สำหรับทีมงานกองประเมินผลองค์กร</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-row"><span class="stat-num">4</span><span class="stat-unit">Dashboards</span></div>
+      <div class="stat-row"><span class="stat-num">8</span><span class="stat-unit">Enablers</span></div>
+      <div class="stat-row"><span class="stat-num">3.75</span><span class="stat-unit">MOU Target</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">01 — DASHBOARDS</span>
+    <span class="section-title">ระบบ Dashboard หลัก</span>
+  </div>
+  <div class="card-grid">
+
+    <!-- 1. Financial -->
+    <a class="dash-card" href="https://pdee-hub.github.io/Dashboard-Financial-69/" target="_blank">
+      <div class="card-accent blue"></div>
+      <div class="card-index">01 · Financial Analytics</div>
+      <div class="card-title">ผลการดำเนินงาน<br>ทางการเงิน</div>
+      <div class="card-desc">วิเคราะห์ผลประกอบการ กทท. และบริษัทในเครือ (ทกท., ทลฉ., ทรน.) ครอบคลุมรายได้-ค่าใช้จ่าย, YoY เปรียบเทียบ, งบประมาณ และแนวโน้มรายเดือน / สะสม FY2569</div>
+      <div class="card-meta-row">
+        <span class="card-tag blue">Financial</span>
+        <span class="card-status live">Live</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- 2. MOU -->
+    <a class="dash-card" href="https://pdee-hub.github.io/MOU69/" target="_blank">
+      <div class="card-accent green"></div>
+      <div class="card-index">02 · MOU Performance</div>
+      <div class="card-title">ผลการดำเนินงาน<br>ตาม MOU 2569</div>
+      <div class="card-desc">ติดตามความคืบหน้า KPI ตามข้อตกลง MOU ปีงบประมาณ 2569 พร้อมระบบ gap analysis เทียบเป้าหมายระดับ 3.75, การป้อนข้อมูลรายไตรมาส และ Export/Import JSON สำหรับหลายหน่วยงาน</div>
+      <div class="card-meta-row">
+        <span class="card-tag green">KPI · MOU</span>
+        <span class="card-status live">Live</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- 3. Enablers FF Score -->
+    <a class="dash-card" href="https://pdee-hub.github.io/SEAM-Enablers-Dashboard/" target="_blank">
+      <div class="card-accent amber"></div>
+      <div class="card-index">03 · SE-AM Core Business Enablers</div>
+      <div class="card-title">Enablers<br>Forecast Score 69</div>
+      <div class="card-desc">ผลคะแนนและคาดการณ์ SE-AM Core Business Enablers ทั้ง 8 ด้าน ปีงบประมาณ 2569 พร้อมวิเคราะห์ช่องว่างรายด้าน Action Checklist และ Key Takeaways จากเกณฑ์ TRIS</div>
+      <div style="margin-top:-8px;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.10em;color:var(--green);display:flex;align-items:center;gap:5px;">
+        <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+        NEW · IA — การตรวจสอบภายใน พร้อมใช้งานแล้ว
+      </div>
+      <div class="card-meta-row">
+        <span class="card-tag amber">SE-AM · CBE</span>
+        <span class="card-status live">Live</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- 4. Enablers Link Map -->
+    <a class="dash-card" href="https://pdee-hub.github.io/Enablers-Link-Document-69/" target="_blank">
+      <div class="card-accent amber"></div>
+      <div class="card-index">04 · CBE Enabler Linkage</div>
+      <div class="card-title">CBE Enabler<br>Linkage Map</div>
+      <div class="card-desc">แผนที่ความเชื่อมโยงระหว่าง Core Business Enablers ทั้ง 8 ด้าน แสดง inter-dimension linkages พร้อมลิงค์เอกสาร Google Drive สำหรับการวิเคราะห์เชิงระบบ</div>
+      <div class="card-meta-row">
+        <span class="card-tag amber">SE-AM · CBE</span>
+        <span class="card-status live">Live</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">02 — COLOR REFERENCE</span>
+    <span class="section-title">ระบบสีและความหมาย</span>
+  </div>
+  <div class="legend-grid">
+    <div class="legend-cell blue">
+      <div class="legend-dot"></div>
+      <div><div class="legend-cat">Blue — Financial</div><div class="legend-detail">การวิเคราะห์ทางการเงิน<br>รายได้ · ค่าใช้จ่าย · กำไร</div></div>
+    </div>
+    <div class="legend-cell green">
+      <div class="legend-dot"></div>
+      <div><div class="legend-cat">Green — KPI Achievement</div><div class="legend-detail">บรรลุเป้าหมาย ≥ 3.75<br>MOU · KPI · ผลลัพธ์</div></div>
+    </div>
+    <div class="legend-cell amber">
+      <div class="legend-dot"></div>
+      <div><div class="legend-cat">Amber — CBE Assessment</div><div class="legend-detail">SE-AM Enablers ทั้ง 8 ด้าน<br>CG · SP · RM&amp;IC · SM · CM · DT · KM/IM · IA</div></div>
+    </div>
+    <div class="legend-cell red">
+      <div class="legend-dot"></div>
+      <div><div class="legend-cat" style="color:var(--red)">Red — Risk / Gap</div><div class="legend-detail">ต่ำกว่าเป้าหมาย<br>ความเสี่ยง · Gap Analysis</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-org">กองประเมินผลองค์กร · การท่าเรือแห่งประเทศไทย</span>
+    <span class="footer-note">Internal Use Only · FY2569 · อัปเดต พ.ค. 2569 · pdee-hub.github.io</span>
+  </div>
+</footer>
+
+</div><!-- /main-content -->
+
+<script>
+const ALLOWED_DOMAIN = 'port.co.th';
+
+function handleCredentialResponse(response) {
+  const payload = parseJwt(response.credential);
+  const email = payload.email || '';
+  if (email.endsWith('@' + ALLOWED_DOMAIN)) {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    document.getElementById('user-email').textContent = email;
+    sessionStorage.setItem('pat_auth', email);
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function parseJwt(token) {
+  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+
+function signOut() {
+  sessionStorage.removeItem('pat_auth');
+  location.reload();
+}
+
+// Auto-restore session ถ้า refresh หน้า
+window.addEventListener('load', () => {
+  const saved = sessionStorage.getItem('pat_auth');
+  if (saved && saved.endsWith('@' + ALLOWED_DOMAIN)) {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    document.getElementById('user-email').textContent = saved;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAT Intelligence Hub — กองแผนงานและยุทธศาสตร์</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050e1a;--bg2:#0a1628;--bg3:#0f1e35;
+  --surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8edf5;--text2:#8899b0;--text3:#4a5a70;
+  --blue:#378add;--blue-dim:rgba(55,138,221,0.08);--blue-glow:rgba(55,138,221,0.15);
+  --green:#639922;--amber:#ba7517;--teal:#1d9e75;--red:#c0392b;
+  --font:'IBM Plex Sans Thai',sans-serif;--mono:'IBM Plex Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* Grid BG */
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(55,138,221,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(55,138,221,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:.1}
+.orb-1{width:600px;height:600px;background:var(--blue);top:-200px;left:-100px;animation:drift 20s ease infinite alternate}
+.orb-2{width:400px;height:400px;background:var(--teal);bottom:-100px;right:-100px;animation:drift 25s ease infinite alternate-reverse}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(40px,30px)}}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,14,26,0.9);backdrop-filter:blur(20px);border-bottom:.5px solid var(--border)}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-mark{width:32px;height:32px;border:1.5px solid var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative}
+.logo-mark::before{content:'';position:absolute;inset:4px;border-right:1.5px solid var(--blue);border-bottom:1.5px solid var(--blue);border-radius:2px;opacity:.5}
+.logo-text{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.08em}
+.logo-text span{color:var(--blue)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-tag{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.nav-badge{background:var(--blue-dim);border:.5px solid rgba(55,138,221,0.3);color:var(--blue);font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:3px;letter-spacing:.1em}
+
+/* Hero */
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;overflow:hidden}
+.hero-island-bg{position:absolute;inset:0;z-index:0;pointer-events:none;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-island-bg img{width:min(900px,110%);height:auto;object-fit:contain;object-position:center 55%;opacity:0.55;mix-blend-mode:screen;filter:saturate(0.7) brightness(0.65);animation:float-island 8s ease-in-out infinite;transform-origin:center center}
+.hero-island-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,transparent 30%,var(--bg) 80%);z-index:1}
+.hero-island-bg::after{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(to bottom,var(--bg) 0%,transparent 100%);z-index:1}
+.hero-island-bottom{position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,var(--bg) 0%,transparent 100%);z-index:1;pointer-events:none}
+.hero > *:not(.hero-island-bg):not(.hero-island-bottom){position:relative;z-index:2}
+.hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fade-up .6s ease .2s forwards}
+.hero-title{font-size:clamp(48px,8vw,90px);font-weight:300;line-height:1.0;letter-spacing:-.02em;margin-bottom:16px;opacity:0;animation:fade-up .6s ease .4s forwards}
+.hero-title strong{font-weight:600;color:var(--blue);font-style:italic}
+.hero-sub{font-size:clamp(16px,2.5vw,22px);font-weight:300;color:var(--text2);margin-bottom:28px;opacity:0;animation:fade-up .6s ease .5s forwards}
+.hero-desc{font-size:14px;color:var(--text2);max-width:540px;line-height:1.8;margin-bottom:44px;opacity:0;animation:fade-up .6s ease .6s forwards}
+.hero-stats{display:flex;gap:40px;justify-content:center;margin-bottom:48px;opacity:0;animation:fade-up .6s ease .7s forwards}
+.stat-num{font-size:30px;font-weight:600;font-family:var(--mono);display:block;line-height:1;margin-bottom:5px}
+.stat-label{font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase}
+.stat-div{width:.5px;background:var(--border2);align-self:stretch}
+.hero-cta{display:flex;gap:12px;justify-content:center;opacity:0;animation:fade-up .6s ease .8s forwards}
+.btn-p{background:var(--blue);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.btn-p:hover{background:#4a9ae8;transform:translateY(-1px)}
+.btn-g{background:transparent;color:var(--text2);border:.5px solid var(--border2);padding:12px 24px;border-radius:6px;font-size:14px;font-family:var(--font);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.btn-g:hover{border-color:var(--blue);color:var(--blue)}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fade-up .6s ease 1.2s forwards}
+.scroll-hint span{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.15em;text-transform:uppercase}
+.scroll-line{width:.5px;height:36px;background:linear-gradient(to bottom,var(--blue),transparent);animation:pulse-l 2s ease infinite}
+@keyframes pulse-l{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* Sections */
+section{position:relative;z-index:1}
+.sec-wrap{padding:80px 40px 100px;max-width:1200px;margin:0 auto}
+.sec-header{text-align:center;margin-bottom:60px}
+.sec-tag{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:12px}
+.sec-title{font-size:30px;font-weight:300;color:var(--text);letter-spacing:-.01em}
+.sec-title strong{font-weight:600}
+.sec-subtitle{color:var(--text2);font-size:14px;margin-top:10px}
+.divider{max-width:1200px;margin:0 auto;padding:0 40px}
+.divider-line{height:.5px;background:var(--border)}
+
+/* Island Scene */
+/* ── Live Island ── */
+.live-island{position:relative;border-radius:16px;overflow:hidden;border:.5px solid var(--border2);background:#0a1222;user-select:none}
+.island-img{display:block;width:100%;height:auto;animation:float-island 7s ease-in-out infinite}
+.island-overlay{position:absolute;inset:0;pointer-events:none}
+
+/* KPI Pin */
+.kpi-pin{position:absolute;transform:translate(-50%,-100%);pointer-events:all;z-index:10;text-decoration:none;display:block}
+.kpi-beacon{width:12px;height:12px;border-radius:50%;margin:0 auto 5px;position:relative}
+.kpi-beacon::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid currentColor;opacity:0;animation:beacon-ring 2s ease infinite}
+.pin-01 .kpi-beacon{background:#378add;color:#378add;box-shadow:0 0 8px #378add;animation:p-blue 2s ease infinite}
+.pin-02 .kpi-beacon{background:#639922;color:#639922;box-shadow:0 0 8px #639922;animation:p-green 2.3s ease infinite}
+.pin-03 .kpi-beacon{background:#ba7517;color:#ba7517;box-shadow:0 0 8px #ba7517;animation:p-amber 2.6s ease infinite}
+.pin-04 .kpi-beacon{background:#1d9e75;color:#1d9e75;box-shadow:0 0 8px #1d9e75;animation:p-teal 1.9s ease infinite}
+@keyframes p-blue{0%,100%{box-shadow:0 0 0 0 rgba(55,138,221,.8)}70%{box-shadow:0 0 0 14px rgba(55,138,221,0)}}
+@keyframes p-green{0%,100%{box-shadow:0 0 0 0 rgba(99,153,34,.8)}70%{box-shadow:0 0 0 14px rgba(99,153,34,0)}}
+@keyframes p-amber{0%,100%{box-shadow:0 0 0 0 rgba(186,117,23,.8)}70%{box-shadow:0 0 0 14px rgba(186,117,23,0)}}
+@keyframes p-teal{0%,100%{box-shadow:0 0 0 0 rgba(29,158,117,.8)}70%{box-shadow:0 0 0 14px rgba(29,158,117,0)}}
+@keyframes beacon-ring{0%{opacity:.8;transform:scale(.6)}100%{opacity:0;transform:scale(2)}}
+
+.kpi-card{background:rgba(4,11,22,0.92);border:.5px solid rgba(255,255,255,0.11);border-radius:9px;padding:9px 12px;min-width:152px;backdrop-filter:blur(14px);box-shadow:0 6px 24px rgba(0,0,0,0.5);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc, #378add);opacity:.7}
+.kpi-pin:hover .kpi-card{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.65)}
+.pin-01 .kpi-card{--kc:#378add}
+.pin-02 .kpi-card{--kc:#639922}
+.pin-03 .kpi-card{--kc:#ba7517}
+.pin-04 .kpi-card{--kc:#1d9e75}
+
+.kpi-top{display:flex;align-items:center;gap:5px;margin-bottom:7px}
+.kpi-led{display:inline-block;width:6px;height:6px;border-radius:50%;animation:led-b 1.6s ease infinite;flex-shrink:0}
+@keyframes led-b{0%,100%{opacity:1}50%{opacity:.2}}
+.kpi-label{font-size:9px;font-family:var(--mono);letter-spacing:.1em;color:var(--text2);flex:1}
+.kpi-status{font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:3px;font-weight:600}
+.kpi-status.ok{background:rgba(29,158,117,.18);color:#1d9e75}
+.kpi-status.warn{background:rgba(186,117,23,.18);color:#ba7517}
+.kpi-status.bad{background:rgba(192,57,43,.18);color:#c0392b}
+
+.kpi-value{font-size:18px;font-weight:600;font-family:var(--mono);line-height:1;margin-bottom:3px;letter-spacing:-.01em}
+.kpi-meta{font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:7px}
+
+/* Progress bar */
+.kpi-bar-wrap{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.kpi-bar{height:100%;border-radius:2px;width:0%;transition:width 1.4s cubic-bezier(.22,1,.36,1)}
+.kpi-vs{font-size:8px;font-family:var(--mono);color:var(--text3)}
+
+/* Floating sparkles on island */
+@keyframes spark{0%,100%{opacity:0;transform:scale(0) translateY(0)}20%{opacity:1;transform:scale(1) translateY(-2px)}80%{opacity:.6;transform:scale(.8) translateY(-12px)}}
+
+/* Ecosystem SVG fix */
+.eco-svg-wrap{width:100%;max-width:960px;margin:0 auto}
+
+/* Update cycle strip */
+.update-strip{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.update-card{background:var(--bg2);border:.5px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:12px;min-width:200px}
+.update-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.update-info{flex:1}
+.update-name{font-size:12px;font-weight:500;color:var(--text);font-family:var(--mono);margin-bottom:3px}
+.update-cycle{font-size:11px;color:var(--text3)}
+.update-badge{font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:3px;letter-spacing:.06em}
+
+/* Dashboard cards */
+.dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.dash-card{background:var(--bg2);border:.5px solid var(--border);border-radius:12px;padding:28px;position:relative;overflow:hidden;cursor:pointer;transition:all .3s;text-decoration:none;display:block}
+.dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac);opacity:.5;transition:opacity .3s}
+.dash-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 30% 20%,var(--ag) 0%,transparent 70%);opacity:0;transition:opacity .3s}
+.dash-card:hover{border-color:var(--ac);transform:translateY(-3px);background:var(--bg3)}
+.dash-card:hover::before{opacity:1}
+.dash-card:hover::after{opacity:1}
+.card-in{position:relative;z-index:1}
+.card-idx{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--text3);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.card-idx::after{content:'';flex:1;height:.5px;background:var(--border)}
+.card-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:20px;background:var(--ad);border:.5px solid var(--ab);transition:transform .3s}
+.dash-card:hover .card-icon{transform:scale(1.1) rotate(-5deg)}
+.card-en{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.1em;margin-bottom:4px}
+.card-th{font-size:18px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.3}
+.card-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px}
+.tag{font-size:9px;font-family:var(--mono);letter-spacing:.06em;padding:2px 7px;border-radius:3px;background:var(--ad);color:var(--ac);border:.5px solid var(--ab)}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.card-link{display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--mono);color:var(--ac);opacity:.7;transition:opacity .2s}
+.dash-card:hover .card-link{opacity:1}
+.card-arr{transition:transform .2s}
+.dash-card:hover .card-arr{transform:translateX(4px)}
+.card-status{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:3px;letter-spacing:.08em}
+.status-dot{width:5px;height:5px;border-radius:50%;animation:blink-d 2s ease infinite}
+@keyframes blink-d{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Color ref */
+.color-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.color-card{background:var(--bg2);border:.5px solid var(--border);border-radius:10px;padding:20px;overflow:hidden}
+.color-swatch{width:36px;height:36px;border-radius:8px;margin-bottom:14px}
+.color-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.color-desc{font-size:11px;color:var(--text2);line-height:1.6}
+.color-scope{margin-top:10px;font-size:9px;font-family:var(--mono);color:var(--text3);letter-spacing:.08em}
+
+/* Footer */
+footer{position:relative;z-index:1;border-top:.5px solid var(--border);padding:28px 40px;display:flex;justify-content:space-between;align-items:center}
+.footer-l{font-size:11px;color:var(--text3);font-family:var(--mono);line-height:1.8}
+.footer-r{display:flex;gap:20px}
+.footer-a{font-size:11px;color:var(--text3);font-family:var(--mono);text-decoration:none;transition:color .2s}
+.footer-a:hover{color:var(--blue)}
+
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float-char{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes bob1{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes bob2{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes bob3{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes bob4{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes float-island{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shimmer{0%,100%{opacity:.3}50%{opacity:.7}}
+
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .hero{padding:100px 20px 60px}
+  .hero-stats{gap:20px}
+  .dash-grid{grid-template-columns:1fr}
+  .color-grid{grid-template-columns:repeat(2,1fr)}
+  footer{flex-direction:column;gap:14px;text-align:center}
+  .sec-wrap{padding-left:20px;padding-right:20px}
+  .update-strip{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<!-- ═══ GOOGLE AUTH GATE ═══ -->
+<style>
+#auth-gate{
+  position:fixed;inset:0;z-index:9999;
+  background:#050e1a;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Sans Thai',sans-serif;
+}
+.auth-box{
+  background:#0a1628;
+  border:.5px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  padding:48px 40px 40px;
+  text-align:center;
+  max-width:380px;width:90%;
+  box-shadow:0 24px 64px rgba(0,0,0,0.6);
+  position:relative;
+  overflow:hidden;
+}
+.auth-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#378add,#1d9e75);
+}
+.auth-logo{
+  width:52px;height:52px;border:1.5px solid #378add;
+  border-radius:10px;margin:0 auto 20px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.auth-logo::before{
+  content:'';position:absolute;inset:5px;
+  border-right:1.5px solid #378add;border-bottom:1.5px solid #378add;
+  border-radius:2px;opacity:.5;
+}
+.auth-title{font-size:20px;font-weight:600;color:#e8edf5;margin-bottom:6px;}
+.auth-sub{font-size:13px;color:#8899b0;margin-bottom:8px;line-height:1.6;}
+.auth-domain{
+  display:inline-block;font-size:11px;font-family:monospace;
+  background:rgba(55,138,221,0.08);border:.5px solid rgba(55,138,221,0.3);
+  color:#378add;padding:4px 10px;border-radius:4px;
+  margin-bottom:28px;letter-spacing:.06em;
+}
+.auth-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:13px 20px;border-radius:8px;border:none;
+  background:#fff;color:#1a1a2e;font-size:14px;font-weight:500;
+  cursor:pointer;transition:all .2s;font-family:inherit;
+}
+.auth-btn:hover{background:#f0f0f0;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.3);}
+.auth-btn svg{flex-shrink:0;}
+.auth-err{
+  margin-top:16px;padding:10px 14px;border-radius:6px;
+  background:rgba(192,57,43,0.12);border:.5px solid rgba(192,57,43,0.3);
+  color:#e74c3c;font-size:12px;display:none;line-height:1.5;
+}
+.auth-note{margin-top:20px;font-size:10px;color:#4a5a70;font-family:monospace;letter-spacing:.06em;}
+.auth-loading{display:none;margin-top:16px;color:#8899b0;font-size:12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(55,138,221,0.2);border-top-color:#378add;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px;}
+</style>
+
+<div id="auth-gate">
+  <div class="auth-box">
+    <div class="auth-logo"></div>
+    <div class="auth-title">PAT Intelligence Hub</div>
+    <div class="auth-sub">กองประเมินผลองค์กร · การท่าเรือแห่งประเทศไทย<br>กรุณาเข้าสู่ระบบด้วยบัญชีองค์กร</div>
+    <div class="auth-domain">@port.co.th เท่านั้น</div>
+    <button class="auth-btn" onclick="startGoogleAuth()">
+      <svg width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        <path fill="none" d="M0 0h48v48H0z"/>
+      </svg>
+      เข้าสู่ระบบด้วย Google
+    </button>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-loading" id="auth-loading"><span class="spinner"></span>กำลังตรวจสอบสิทธิ์...</div>
+    <div class="auth-note">Internal Use Only · FY2569</div>
+  </div>
+</div>
+
+<script>
+// ── Google OAuth Config ──
+var GOOGLE_CLIENT_ID  = '850818349851-ukh2ldprhknc44e2c5sij0fbnjr2c6fd.apps.googleusercontent.com';
+var REDIRECT_URI      = 'https://pdee-hub.github.io/PAT-Analytic-Hub/';
+var ALLOWED_DOMAIN    = 'port.co.th';
+var SESSION_KEY       = 'pat_hub_auth';
+
+// ── Check existing session ──
+(function(){
+  try {
+    var s = sessionStorage.getItem(SESSION_KEY);
+    if (s) {
+      var d = JSON.parse(s);
+      if (d.email && d.email.endsWith('@' + ALLOWED_DOMAIN) && d.exp > Date.now()) {
+        showContent(d.email);
+        return;
+      }
+    }
+  } catch(e){}
+
+  // ── Handle OAuth callback (token in URL hash) ──
+  var hash = window.location.hash;
+  if (hash.indexOf('access_token') !== -1) {
+    document.getElementById('auth-loading').style.display = 'block';
+    document.querySelector('.auth-btn').style.display = 'none';
+    var params = {};
+    hash.replace('#','').split('&').forEach(function(p){
+      var kv = p.split('='); params[kv[0]] = decodeURIComponent(kv[1]||'');
+    });
+    if (params.access_token) {
+      verifyToken(params.access_token);
+    } else {
+      showError('ไม่พบ access token กรุณาลองใหม่');
+    }
+  }
+})();
+
+function startGoogleAuth() {
+  var scope   = encodeURIComponent('openid email profile');
+  var state   = Math.random().toString(36).slice(2);
+  var url = 'https://accounts.google.com/o/oauth2/v2/auth'
+    + '?client_id='     + encodeURIComponent(GOOGLE_CLIENT_ID)
+    + '&redirect_uri='  + encodeURIComponent(REDIRECT_URI)
+    + '&response_type=token'
+    + '&scope='         + scope
+    + '&hd='            + encodeURIComponent(ALLOWED_DOMAIN)
+    + '&state='         + state
+    + '&prompt=select_account';
+  window.location.href = url;
+}
+
+function verifyToken(token) {
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(info) {
+    var email = info.email || '';
+    if (!email.endsWith('@' + ALLOWED_DOMAIN)) {
+      showError(
+        '⚠️ บัญชีนี้ไม่ได้รับอนุญาต<br>' +
+        '<strong>' + email + '</strong><br>' +
+        'กรุณาใช้ email <strong>@port.co.th</strong> เท่านั้น'
+      );
+      return;
+    }
+    // Save session (8 hours)
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      email: email,
+      name:  info.name || '',
+      exp:   Date.now() + 8 * 60 * 60 * 1000
+    }));
+    // Clean hash from URL
+    history.replaceState(null, '', window.location.pathname);
+    showContent(email);
+  })
+  .catch(function(){
+    showError('ไม่สามารถตรวจสอบสิทธิ์ได้ กรุณาลองใหม่อีกครั้ง');
+  });
+}
+
+function showContent(email) {
+  var gate = document.getElementById('auth-gate');
+  if (gate) gate.style.display = 'none';
+  // Show user badge in nav
+  var badge = document.createElement('span');
+  badge.style.cssText = 'font-size:10px;font-family:monospace;color:#8899b0;letter-spacing:.06em;';
+  badge.textContent = '● ' + email;
+  var navRight = document.querySelector('.nav-right');
+  if (navRight) navRight.prepend(badge);
+}
+
+function showError(msg) {
+  var err = document.getElementById('auth-err');
+  var loading = document.getElementById('auth-loading');
+  var btn = document.querySelector('.auth-btn');
+  if (err)     { err.innerHTML = msg; err.style.display = 'block'; }
+  if (loading) loading.style.display = 'none';
+  if (btn)     btn.style.display = 'flex';
+}
+</script>
+
+<nav>
+  <div class="logo-wrap">
+    <div class="logo-mark"></div>
+    <div class="logo-text">PAT <span>Intelligence</span> Hub</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-tag">กองประเมินผลองค์กร · กทท.</span>
+    <span class="nav-badge">FY2569</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-island-bg">
+    <img src="pat_island_noborder.png" alt="" aria-hidden="true">
+  </div>
+  <div class="hero-island-bottom"></div>
+  <p class="hero-eyebrow">Performance Intelligence Platform · การท่าเรือแห่งประเทศไทย</p>
+  <h1 class="hero-title">PAT <strong>Analytics</strong> Hub</h1>
+  <p class="hero-sub">Ecosystem ระบบ Dashboard วิเคราะห์ประสิทธิภาพองค์กร</p>
+  <p class="hero-desc">ศูนย์รวม Dashboard การวิเคราะห์ประสิทธิภาพ กทท. ครบวงจร ครอบคลุมการเงิน, ตัวชี้วัด MOU, และการประเมิน SE-AM Core Business Enablers — ทั้ง 4 ระบบเชื่อมโยงเป็น Ecosystem เดียว</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="stat-num">4</span>
+      <span class="stat-label">Dashboards</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="hero-stat">
+      <span class="stat-num">8</span>
+      <span class="stat-label">Enablers</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="hero-stat">
+      <span class="stat-num">3.75</span>
+      <span class="stat-label">MOU Target</span>
+    </div>
+    <div class="stat-div"></div>
+    <div class="hero-stat">
+      <span class="stat-num">FY69</span>
+      <span class="stat-label">ปีงบประมาณ</span>
+    </div>
+  </div>
+  <div class="hero-cta">
+    <a href="#dashboards" class="btn-p">เข้าสู่ระบบ Dashboard <span>↓</span></a>
+    <a href="#ecosystem" class="btn-g">ดู Ecosystem <span>→</span></a>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ISLAND ECOSYSTEM SCENE -->
+<section id="ecosystem">
+  <div class="sec-wrap">
+    <div class="sec-header">
+      <span class="sec-tag">01 — Ecosystem</span>
+      <h2 class="sec-title">เกาะ <strong>PAT Analytics</strong></h2>
+      <p class="sec-subtitle">4 ระบบ Dashboard ที่อยู่ร่วมกันในระบบนิเวศเดียว — คลิกที่ป้ายเพื่อเข้าใช้งาน</p>
+    </div>
+
+    <!-- LIVE ISLAND: ภาพจริง + KPI Overlay -->
+    <div class="live-island" id="live-island">
+
+      <!-- ภาพ pixel art เกาะ -->
+      <img class="island-img" src="pat_island_noborder.png" alt="PAT Analytics Island" id="islandImg">
+
+      <!-- KPI Pin Overlays — positioned % over image -->
+      <div class="island-overlay">
+
+        <!-- ── 01 FINANCIAL ── -->
+        <a class="kpi-pin pin-01" href="#" onclick="openFinancial(event)"
+           style="left:29%;top:58%;">
+          <div class="kpi-beacon" id="beacon01"></div>
+          <div class="kpi-card" id="card01">
+            <div class="kpi-top">
+              <span class="kpi-led" id="led01"></span>
+              <span class="kpi-label">01 · Financial</span>
+              <span class="kpi-status" id="status01"></span>
+            </div>
+            <div class="kpi-value" id="val01">—</div>
+            <div class="kpi-meta" id="meta01">รายได้รวม YTD</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="bar01"></div></div>
+            <div class="kpi-vs" id="vs01"></div>
+          </div>
+        </a>
+
+        <!-- ── 02 MOU KPI ── -->
+        <a class="kpi-pin pin-02" href="https://pdee-hub.github.io/MOU69/" target="_blank"
+           style="left:43%;top:51%;">
+          <div class="kpi-beacon" id="beacon02"></div>
+          <div class="kpi-card" id="card02">
+            <div class="kpi-top">
+              <span class="kpi-led" id="led02"></span>
+              <span class="kpi-label">02 · MOU KPI</span>
+              <span class="kpi-status" id="status02"></span>
+            </div>
+            <div class="kpi-value" id="val02">—</div>
+            <div class="kpi-meta" id="meta02">คะแนน MOU เฉลี่ย</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="bar02"></div></div>
+            <div class="kpi-vs" id="vs02"></div>
+          </div>
+        </a>
+
+        <!-- ── 03 SE-AM ── -->
+        <a class="kpi-pin pin-03" href="https://pdee-hub.github.io/SEAM-Enablers-Dashboard/" target="_blank"
+           style="left:58%;top:51%;">
+          <div class="kpi-beacon" id="beacon03"></div>
+          <div class="kpi-card" id="card03">
+            <div class="kpi-top">
+              <span class="kpi-led" id="led03"></span>
+              <span class="kpi-label">03 · SE-AM</span>
+              <span class="kpi-status" id="status03"></span>
+            </div>
+            <div class="kpi-value" id="val03">—</div>
+            <div class="kpi-meta" id="meta03">Enablers บรรลุเป้า</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="bar03"></div></div>
+            <div class="kpi-vs" id="vs03"></div>
+          </div>
+        </a>
+
+        <!-- ── 04 LINKAGE ── -->
+        <a class="kpi-pin pin-04" href="https://pdee-hub.github.io/Enablers-Link-Document-69/" target="_blank"
+           style="left:72%;top:55%;">
+          <div class="kpi-beacon" id="beacon04"></div>
+          <div class="kpi-card" id="card04">
+            <div class="kpi-top">
+              <span class="kpi-led" id="led04"></span>
+              <span class="kpi-label">04 · Linkage</span>
+              <span class="kpi-status" id="status04"></span>
+            </div>
+            <div class="kpi-value" id="val04">—</div>
+            <div class="kpi-meta" id="meta04">Inter-dimension Links</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="bar04"></div></div>
+            <div class="kpi-vs" id="vs04"></div>
+          </div>
+        </a>
+
+      </div>
+    </div><!-- /live-island -->
+
+    <!-- Update Cycle Strip -->
+    <div class="update-strip">
+      <div class="update-card">
+        <div class="update-dot" style="background:#378add;box-shadow:0 0 6px #378add44;"></div>
+        <div class="update-info">
+          <div class="update-name">01 · Financial Analytics</div>
+          <div class="update-cycle">อัปเดตทุก 2 สัปดาห์ – 1 เดือน</div>
+        </div>
+        <span class="update-badge" style="background:rgba(55,138,221,0.1);color:#378add;border:.5px solid rgba(55,138,221,0.3);">Monthly</span>
+      </div>
+      <div class="update-card">
+        <div class="update-dot" style="background:#639922;box-shadow:0 0 6px #63992244;"></div>
+        <div class="update-info">
+          <div class="update-name">02 · MOU Performance</div>
+          <div class="update-cycle">อัปเดตรายไตรมาส Q1–Q4</div>
+        </div>
+        <span class="update-badge" style="background:rgba(99,153,34,0.1);color:#639922;border:.5px solid rgba(99,153,34,0.3);">Quarterly</span>
+      </div>
+      <div class="update-card">
+        <div class="update-dot" style="background:#ba7517;box-shadow:0 0 6px #ba751744;"></div>
+        <div class="update-info">
+          <div class="update-name">03 · SE-AM Enablers</div>
+          <div class="update-cycle">อัปเดตตามรอบการประเมิน</div>
+        </div>
+        <span class="update-badge" style="background:rgba(186,117,23,0.1);color:#ba7517;border:.5px solid rgba(186,117,23,0.3);">Periodic</span>
+      </div>
+      <div class="update-card">
+        <div class="update-dot" style="background:#1d9e75;box-shadow:0 0 6px #1d9e7544;"></div>
+        <div class="update-info">
+          <div class="update-name">04 · CBE Linkage Map</div>
+          <div class="update-cycle">อัปเดตตามเอกสาร Drive</div>
+        </div>
+        <span class="update-badge" style="background:rgba(29,158,117,0.1);color:#1d9e75;border:.5px solid rgba(29,158,117,0.3);">On-demand</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- DASHBOARDS -->
+<section id="dashboards">
+  <div class="sec-wrap">
+    <div class="divider" style="margin-bottom:80px;"><div class="divider-line"></div></div>
+    <div class="sec-header">
+      <span class="sec-tag">02 — Systems</span>
+      <h2 class="sec-title">4 <strong>Dashboard</strong> ระบบหลัก</h2>
+      <p class="sec-subtitle">คลิกเพื่อเข้าใช้งาน Dashboard แต่ละระบบโดยตรง</p>
+    </div>
+    <div class="dash-grid">
+
+      <a href="#" onclick="openFinancial(event)" class="dash-card"
+         style="--ac:#378add;--ag:rgba(55,138,221,0.12);--ad:rgba(55,138,221,0.08);--ab:rgba(55,138,221,0.2);">
+        <div class="card-in">
+          <div class="card-idx" style="color:#378add;">01 · FINANCIAL ANALYTICS</div>
+          <div class="card-icon" style="color:#378add;">💹</div>
+          <p class="card-en">Financial Performance Dashboard</p>
+          <h3 class="card-th">ผลการดำเนินงานทางการเงิน</h3>
+          <p class="card-desc">วิเคราะห์ผลประกอบการ กทท. และบริษัทในเครือ ทกท., ทลฉ., ทรน. ครอบคลุมรายได้-ค่าใช้จ่าย, Year-over-Year, งบประมาณ และแนวโน้มรายเดือน/สะสม</p>
+          <div class="card-tags">
+            <span class="tag">Revenue</span><span class="tag">Expense</span><span class="tag">YoY</span><span class="tag">Monthly Trend</span><span class="tag">Budget vs Actual</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-link">เปิด Financial Analytics <span class="card-arr">→</span></div>
+            <span class="card-status" style="color:#1d9e75;background:rgba(29,158,117,0.08);border:.5px solid rgba(29,158,117,0.25);">
+              <span class="status-dot" style="background:#1d9e75;"></span>LIVE
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://pdee-hub.github.io/MOU69/" target="_blank" class="dash-card"
+         style="--ac:#639922;--ag:rgba(99,153,34,0.12);--ad:rgba(99,153,34,0.08);--ab:rgba(99,153,34,0.2);">
+        <div class="card-in">
+          <div class="card-idx" style="color:#639922;">02 · MOU PERFORMANCE</div>
+          <div class="card-icon" style="color:#639922;">🎯</div>
+          <p class="card-en">KPI · MOU Tracking Dashboard</p>
+          <h3 class="card-th">ผลการดำเนินงานตาม MOU 2569</h3>
+          <p class="card-desc">ติดตามความคืบหน้า KPI ตาม MOU ปีงบ 2569 พร้อม Gap Analysis เทียบเป้าหมาย 3.75, ป้อนข้อมูลรายไตรมาส และ Export/Import JSON สำหรับหลายหน่วยงาน</p>
+          <div class="card-tags">
+            <span class="tag">KPI Tracking</span><span class="tag">Gap Analysis</span><span class="tag">Target 3.75</span><span class="tag">Q1–Q4</span><span class="tag">JSON Export</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-link" style="color:#639922;">เปิด MOU Performance <span class="card-arr">→</span></div>
+            <span class="card-status" style="color:#1d9e75;background:rgba(29,158,117,0.08);border:.5px solid rgba(29,158,117,0.25);">
+              <span class="status-dot" style="background:#1d9e75;"></span>LIVE
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://pdee-hub.github.io/SEAM-Enablers-Dashboard/" target="_blank" class="dash-card"
+         style="--ac:#ba7517;--ag:rgba(186,117,23,0.12);--ad:rgba(186,117,23,0.08);--ab:rgba(186,117,23,0.2);">
+        <div class="card-in">
+          <div class="card-idx" style="color:#ba7517;">03 · SE-AM CORE BUSINESS ENABLERS</div>
+          <div class="card-icon" style="color:#ba7517;">⚙️</div>
+          <p class="card-en">Enablers Forecast Score Dashboard</p>
+          <h3 class="card-th">SE-AM Core Business Enablers</h3>
+          <p class="card-desc">ผลคะแนนและคาดการณ์ SE-AM Enablers ทั้ง 8 ด้าน ปีงบ 2569 วิเคราะห์ช่องว่างรายด้าน, Action Checklist, Key Takeaways จากเกณฑ์ TRIS</p>
+          <div class="card-tags">
+            <span class="tag">8 Enablers</span><span class="tag">TRIS</span><span class="tag">Forecast</span><span class="tag">Action Plan</span><span class="tag">IA · CG · SM</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-link" style="color:#ba7517;">เปิด SE-AM Dashboard <span class="card-arr">→</span></div>
+            <span class="card-status" style="color:#1d9e75;background:rgba(29,158,117,0.08);border:.5px solid rgba(29,158,117,0.25);">
+              <span class="status-dot" style="background:#1d9e75;"></span>LIVE
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://pdee-hub.github.io/Enablers-Link-Document-69/" target="_blank" class="dash-card"
+         style="--ac:#1d9e75;--ag:rgba(29,158,117,0.12);--ad:rgba(29,158,117,0.08);--ab:rgba(29,158,117,0.2);">
+        <div class="card-in">
+          <div class="card-idx" style="color:#1d9e75;">04 · CBE ENABLER LINKAGE</div>
+          <div class="card-icon" style="color:#1d9e75;">🔗</div>
+          <p class="card-en">CBE Inter-Dimension Linkage Map</p>
+          <h3 class="card-th">CBE Enabler Linkage Map</h3>
+          <p class="card-desc">แผนที่ความเชื่อมโยงระหว่าง Core Business Enablers ทั้ง 8 ด้าน แสดง Inter-dimension Linkages พร้อมลิงก์เอกสาร Google Drive สำหรับวิเคราะห์เชิงระบบ</p>
+          <div class="card-tags">
+            <span class="tag">Inter-dimension</span><span class="tag">Linkage Map</span><span class="tag">Google Drive</span><span class="tag">Systemic View</span>
+          </div>
+          <div class="card-footer">
+            <div class="card-link" style="color:#1d9e75;">เปิด Linkage Map <span class="card-arr">→</span></div>
+            <span class="card-status" style="color:#1d9e75;background:rgba(29,158,117,0.08);border:.5px solid rgba(29,158,117,0.25);">
+              <span class="status-dot" style="background:#1d9e75;"></span>LIVE
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- COLOR REFERENCE -->
+<section>
+  <div class="sec-wrap">
+    <div class="divider" style="margin-bottom:80px;"><div class="divider-line"></div></div>
+    <div class="sec-header">
+      <span class="sec-tag">03 — Color System</span>
+      <h2 class="sec-title">ระบบสี <strong>และความหมาย</strong></h2>
+      <p class="sec-subtitle">สีที่ใช้สื่อสารความหมายทั่วทั้ง Ecosystem</p>
+    </div>
+    <div class="color-grid">
+      <div class="color-card" style="border-top:2px solid #378add;">
+        <div class="color-swatch" style="background:rgba(55,138,221,0.15);border:.5px solid rgba(55,138,221,0.3);"></div>
+        <div class="color-name" style="color:#378add;">Blue — Financial</div>
+        <p class="color-desc">การวิเคราะห์ทางการเงิน · รายได้ · ค่าใช้จ่าย · กำไร</p>
+        <p class="color-scope">Dashboard 01 · Financial Analytics</p>
+      </div>
+      <div class="color-card" style="border-top:2px solid #639922;">
+        <div class="color-swatch" style="background:rgba(99,153,34,0.15);border:.5px solid rgba(99,153,34,0.3);"></div>
+        <div class="color-name" style="color:#639922;">Green — KPI Achievement</div>
+        <p class="color-desc">บรรลุเป้าหมาย ≥ 3.75 · MOU · KPI · ผลลัพธ์</p>
+        <p class="color-scope">Dashboard 02 · MOU Performance</p>
+      </div>
+      <div class="color-card" style="border-top:2px solid #ba7517;">
+        <div class="color-swatch" style="background:rgba(186,117,23,0.15);border:.5px solid rgba(186,117,23,0.3);"></div>
+        <div class="color-name" style="color:#ba7517;">Amber — CBE Assessment</div>
+        <p class="color-desc">SE-AM Enablers 8 ด้าน · CG · SP · RM&IC · SM · CM · DT · KM/IM · IA</p>
+        <p class="color-scope">Dashboard 03 · SE-AM Enablers</p>
+      </div>
+      <div class="color-card" style="border-top:2px solid #c0392b;">
+        <div class="color-swatch" style="background:rgba(192,57,43,0.15);border:.5px solid rgba(192,57,43,0.3);"></div>
+        <div class="color-name" style="color:#c0392b;">Red — Risk / Gap</div>
+        <p class="color-desc">ต่ำกว่าเป้าหมาย · ความเสี่ยง · Gap Analysis</p>
+        <p class="color-scope">ทุก Dashboard · Warning Signal</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-l">
+    <div>กองประเมินผลองค์กร · การท่าเรือแห่งประเทศไทย</div>
+    <div style="margin-top:3px;">Internal Use Only · FY2569 · อัปเดต พ.ค. 2569 · pdee-hub.github.io</div>
+  </div>
+  <div class="footer-r">
+    <a href="#" onclick="openFinancial(event)" class="footer-a">Financial</a>
+    <a href="https://pdee-hub.github.io/MOU69/" target="_blank" class="footer-a">MOU</a>
+    <a href="https://pdee-hub.github.io/SEAM-Enablers-Dashboard/" target="_blank" class="footer-a">SE-AM</a>
+    <a href="https://pdee-hub.github.io/Enablers-Link-Document-69/" target="_blank" class="footer-a">Linkage</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ═══════════════════════════════════════════════
+  // KPI DATA — แก้ตัวเลขตรงนี้เมื่ออัปเดตผลงาน
+  // ═══════════════════════════════════════════════
+  var KPI = {
+    '01': {
+      value:  2847,   target: 2800,
+      format: function(v){ return '\u0e3f ' + Math.round(v).toLocaleString() + 'M'; },
+      unit:   '\u0e23\u0e32\u0e22\u0e44\u0e14\u0e49\u0e23\u0e27\u0e21 YTD'
+    },
+    '02': {
+      value:  3.82,   target: 3.75,
+      format: function(v){ return v.toFixed(2); },
+      unit:   '\u0e04\u0e30\u0e41\u0e19\u0e19 MOU \u0e40\u0e09\u0e25\u0e35\u0e48\u0e22'
+    },
+    '03': {
+      value:  6,      target: 8,
+      format: function(v){ return Math.round(v) + ' / 8'; },
+      unit:   'Enablers \u0e1a\u0e23\u0e23\u0e25\u0e38\u0e40\u0e1b\u0e49\u0e32'
+    },
+    '04': {
+      value:  28,     target: 28,
+      format: function(v){ return Math.round(v); },
+      unit:   'Inter-dimension Links'
+    }
+  };
+
+  function getStatus(val, target) {
+    var r = val / target;
+    if (r >= 1.0)  return { cls:'ok',   icon:'\u25b2', text:'\u0e40\u0e01\u0e34\u0e19\u0e40\u0e1b\u0e49\u0e32' };
+    if (r >= 0.90) return { cls:'warn', icon:'\u25b6', text:'\u0e43\u0e01\u0e25\u0e49\u0e40\u0e1b\u0e49\u0e32' };
+    return               { cls:'bad',  icon:'\u25bc', text:'\u0e15\u0e48\u0e33\u0e01\u0e27\u0e48\u0e32\u0e40\u0e1b\u0e49\u0e32' };
+  }
+
+  function countUp(el, from, to, ms, fmt) {
+    var s = null;
+    (function step(ts) {
+      if (!s) s = ts;
+      var p = Math.min((ts - s) / ms, 1);
+      el.textContent = fmt(from + (to - from) * (1 - Math.pow(1-p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    })(performance.now());
+  }
+
+  function render() {
+    ['01','02','03','04'].forEach(function(id) {
+      var d   = KPI[id];
+      var st  = getStatus(d.value, d.target);
+      var pct = Math.min((d.value / d.target) * 100, 100);
+      var lc  = st.cls==='ok' ? '#1d9e75' : st.cls==='warn' ? '#ba7517' : '#c0392b';
+
+      var led = document.getElementById('led'+id);
+      if (led) { led.style.background = lc; led.style.boxShadow = '0 0 5px '+lc; }
+
+      var beacon = document.getElementById('beacon'+id);
+      if (beacon) { beacon.style.background = lc; beacon.style.boxShadow = '0 0 10px '+lc; beacon.style.color = lc; }
+
+      var statusEl = document.getElementById('status'+id);
+      if (statusEl) { statusEl.textContent = st.icon+' '+st.text; statusEl.className = 'kpi-status '+st.cls; }
+
+      var card = document.getElementById('card'+id);
+      if (card) card.style.setProperty('--kc', lc);
+
+      var valEl = document.getElementById('val'+id);
+      if (valEl) { valEl.style.color = lc; countUp(valEl, 0, d.value, 1600, d.format); }
+
+      var bar = document.getElementById('bar'+id);
+      if (bar) {
+        bar.style.background = lc;
+        setTimeout(function(){ bar.style.width = pct+'%'; }, 100);
+      }
+
+      var vs = document.getElementById('vs'+id);
+      if (vs) {
+        var diff = ((d.value - d.target)/d.target*100).toFixed(1);
+        vs.textContent = '\u0e40\u0e1b\u0e49\u0e32 '+d.format(d.target)+'  ('+(diff>=0?'+':'')+diff+'%)';
+        vs.style.color = lc;
+      }
+
+      var meta = document.getElementById('meta'+id);
+      if (meta) meta.textContent = d.unit;
+    });
+  }
+
+  var island = document.getElementById('live-island'), done = false;
+  if (island && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function(e){
+      if (e[0].isIntersecting && !done){ done=true; render(); }
+    }, {threshold:0.25}).observe(island);
+  } else { setTimeout(render, 400); }
+
+  // sync overlay height
+  var img = document.getElementById('islandImg');
+  function sync(){ var ov=document.querySelector('.island-overlay'); if(ov&&img) ov.style.height=img.offsetHeight+'px'; }
+  if (img) img.addEventListener('load', sync);
+  window.addEventListener('resize', sync);
+  setTimeout(sync, 200);
+})();
+</script>
+
+<!-- ═══ FINANCIAL PIN MODAL ═══ -->
+<style>
+#fin-modal{
+  position:fixed;inset:0;z-index:10000;
+  background:rgba(5,14,26,0.92);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+#fin-modal.show{display:flex;}
+.fin-box{
+  background:#0a1628;
+  border:.5px solid rgba(55,138,221,0.25);
+  border-radius:14px;
+  padding:36px 32px 32px;
+  text-align:center;
+  width:320px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.7);
+  position:relative;overflow:hidden;
+}
+.fin-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#378add 0%,rgba(55,138,221,0.2) 100%);
+}
+.fin-icon{
+  font-size:28px;margin-bottom:14px;
+  width:56px;height:56px;border-radius:12px;
+  background:rgba(55,138,221,0.1);border:.5px solid rgba(55,138,221,0.3);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+}
+.fin-title{font-size:16px;font-weight:600;color:#e8edf5;margin-bottom:4px;}
+.fin-sub{font-size:12px;color:#8899b0;margin-bottom:22px;line-height:1.6;}
+.fin-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:6px;}
+.fin-digit{
+  width:44px;height:52px;
+  background:#050e1a;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:8px;
+  font-size:22px;font-weight:600;font-family:monospace;
+  color:#378add;text-align:center;
+  outline:none;caret-color:transparent;
+  transition:border-color .2s,box-shadow .2s;
+}
+.fin-digit:focus{border-color:#378add;box-shadow:0 0 0 3px rgba(55,138,221,0.15);}
+.fin-digit.filled{border-color:rgba(55,138,221,0.5);}
+.fin-digit.shake{animation:pin-shake .3s ease;}
+@keyframes pin-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fin-err{
+  font-size:11px;color:#e74c3c;margin-bottom:14px;
+  min-height:16px;font-family:monospace;
+  opacity:0;transition:opacity .2s;
+}
+.fin-err.show{opacity:1;}
+.fin-submit{
+  width:100%;padding:11px;border-radius:7px;border:none;
+  background:#378add;color:#fff;font-size:14px;font-weight:500;
+  font-family:inherit;cursor:pointer;transition:all .2s;margin-bottom:10px;
+}
+.fin-submit:hover{background:#4a9ae8;transform:translateY(-1px);}
+.fin-cancel{
+  background:none;border:none;color:#4a5a70;
+  font-size:12px;font-family:monospace;cursor:pointer;
+  letter-spacing:.06em;transition:color .2s;
+}
+.fin-cancel:hover{color:#8899b0;}
+/* dots progress */
+.fin-dots{display:flex;gap:6px;justify-content:center;margin-bottom:18px;}
+.fin-dot{width:8px;height:8px;border-radius:50%;background:rgba(55,138,221,0.15);border:.5px solid rgba(55,138,221,0.3);transition:background .15s;}
+.fin-dot.active{background:#378add;}
+</style>
+
+<div id="fin-modal">
+  <div class="fin-box">
+    <div class="fin-icon">💹</div>
+    <div class="fin-title">Financial Dashboard</div>
+    <div class="fin-sub">ระบบนี้เป็นข้อมูลทางการเงิน<br>กรุณาใส่รหัสเพื่อเข้าถึง</div>
+    <div class="fin-dots">
+      <div class="fin-dot" id="dot0"></div>
+      <div class="fin-dot" id="dot1"></div>
+      <div class="fin-dot" id="dot2"></div>
+      <div class="fin-dot" id="dot3"></div>
+      <div class="fin-dot" id="dot4"></div>
+    </div>
+    <div class="fin-inputs">
+      <input class="fin-digit" id="d0" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+      <input class="fin-digit" id="d1" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+      <input class="fin-digit" id="d2" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+      <input class="fin-digit" id="d3" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+      <input class="fin-digit" id="d4" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+    </div>
+    <div class="fin-err" id="fin-err">รหัสไม่ถูกต้อง กรุณาลองใหม่</div>
+    <button class="fin-submit" onclick="checkFinPin()">ยืนยัน</button>
+    <button class="fin-cancel" onclick="closeFinModal()">ยกเลิก</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // PIN stored as SHA-256 hash only — ไม่มีรหัสจริงในโค้ด
+  var CORRECT_HASH = '0adfc5dfa66ddf90e5e3b6b5fd730aeb5b67d7968a9bd38533db37b584c930e0';
+  var FIN_URL = 'https://pdee-hub.github.io/Dashboard-Financial-69/';
+  var PIN_SESSION = 'pat_fin_pin';
+
+  // ── Expose global functions ──
+  window.openFinancial = function(e) {
+    if (e) e.preventDefault();
+    // Check if already verified this session
+    if (sessionStorage.getItem(PIN_SESSION) === '1') {
+      window.open(FIN_URL, '_blank');
+      return;
+    }
+    openFinModal();
+  };
+
+  window.closeFinModal = function() {
+    var modal = document.getElementById('fin-modal');
+    if (modal) modal.classList.remove('show');
+    clearDigits();
+  };
+
+  window.checkFinPin = function() {
+    var pin = ['d0','d1','d2','d3','d4'].map(function(id){
+      return (document.getElementById(id)||{}).value || '';
+    }).join('');
+
+    // Hash the input and compare — ไม่มีการเปรียบ plain text
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin))
+      .then(function(buf){
+        var hex = Array.from(new Uint8Array(buf))
+          .map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+        if (hex === CORRECT_HASH) {
+          sessionStorage.setItem(PIN_SESSION, '1');
+          closeFinModal();
+          window.open(FIN_URL, '_blank');
+        } else {
+          showPinError();
+        }
+      });
+  };
+
+  function openFinModal() {
+    clearDigits();
+    clearError();
+    var modal = document.getElementById('fin-modal');
+    if (modal) {
+      modal.classList.add('show');
+      setTimeout(function(){ var d=document.getElementById('d0'); if(d) d.focus(); }, 80);
+    }
+  }
+
+  function clearDigits() {
+    for (var i = 0; i < 5; i++) {
+      var el = document.getElementById('d' + i);
+      if (el) { el.value = ''; el.classList.remove('filled','shake'); }
+      var dot = document.getElementById('dot' + i);
+      if (dot) dot.classList.remove('active');
+    }
+  }
+
+  function clearError() {
+    var err = document.getElementById('fin-err');
+    if (err) err.classList.remove('show');
+  }
+
+  function showPinError() {
+    var err = document.getElementById('fin-err');
+    if (err) err.classList.add('show');
+    // Shake all digits
+    for (var i = 0; i < 5; i++) {
+      var el = document.getElementById('d' + i);
+      if (el) {
+        el.classList.add('shake');
+        el.value = '';
+        el.classList.remove('filled');
+        var dot = document.getElementById('dot' + i);
+        if (dot) dot.classList.remove('active');
+      }
+    }
+    setTimeout(function(){
+      for (var i = 0; i < 5; i++) {
+        var el = document.getElementById('d' + i);
+        if (el) el.classList.remove('shake');
+      }
+      var d = document.getElementById('d0');
+      if (d) d.focus();
+    }, 350);
+  }
+
+  // ── Digit auto-advance ──
+  document.addEventListener('DOMContentLoaded', function(){
+    for (var i = 0; i < 5; i++) {
+      (function(idx){
+        var el = document.getElementById('d' + idx);
+        if (!el) return;
+        el.addEventListener('input', function() {
+          var v = this.value.replace(/[^0-9]/g,'');
+          this.value = v.slice(-1);
+          clearError();
+          var dot = document.getElementById('dot' + idx);
+          if (this.value) {
+            this.classList.add('filled');
+            if (dot) dot.classList.add('active');
+            // Auto-advance
+            if (idx < 4) {
+              var next = document.getElementById('d' + (idx+1));
+              if (next) next.focus();
+            } else {
+              // Last digit — auto submit
+              setTimeout(window.checkFinPin, 120);
+            }
+          } else {
+            this.classList.remove('filled');
+            if (dot) dot.classList.remove('active');
+          }
+        });
+        el.addEventListener('keydown', function(e){
+          // Backspace → go back
+          if (e.key === 'Backspace' && !this.value && idx > 0) {
+            var prev = document.getElementById('d' + (idx-1));
+            if (prev) { prev.value=''; prev.classList.remove('filled'); prev.focus();
+              var dot = document.getElementById('dot' + (idx-1));
+              if (dot) dot.classList.remove('active');
+            }
+          }
+          // Enter → submit
+          if (e.key === 'Enter') window.checkFinPin();
+          // Escape → close
+          if (e.key === 'Escape') window.closeFinModal();
+        });
+        // Click modal backdrop to close
+        var modal = document.getElementById('fin-modal');
+        if (modal) {
+          modal.addEventListener('click', function(e){
+            if (e.target === modal) window.closeFinModal();
+          });
+        }
+      })(i);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
